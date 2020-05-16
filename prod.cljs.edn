@@ -1,0 +1,4 @@
+{:main     b.core
+ :output-to "deploy/cljs-out/dev-main.js"
+ :optimizations :advanced
+}
