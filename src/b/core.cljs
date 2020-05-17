@@ -6,6 +6,7 @@
             [b.utils :as u]
             [b.pages.registry :as pages]
             [b.pages.core :as page]
+            [b.domain.core :as d]
             [akiroz.re-frame.storage :refer [reg-co-fx!]]))
 
 
@@ -37,6 +38,7 @@
   []
   (u/set-if-dev)
   (rf/dispatch-sync [::initialize])
+  (rf/dispatch-sync [::d/init])
   (mount))
 
 

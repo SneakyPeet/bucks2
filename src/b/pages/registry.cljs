@@ -1,7 +1,9 @@
 (ns b.pages.registry
   (:require [b.pages.core :as p]
-            [b.pages.help :as help]))
+            [b.pages.help :as help]
+            [b.pages.accounts :as accounts]))
 
+(p/reg-page "Accounts" accounts/component 0)
 (p/reg-page "Help" help/component 1)
 (p/reg-page "Refresh" (fn [] [:div]) 2)
 

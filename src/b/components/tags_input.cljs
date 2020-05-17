@@ -3,15 +3,17 @@
             [goog.object]))
 
 
-(defn component [& {:keys [items selected-items select de-select can-add? placeholder]
-                    :or {items []
+(defn component [& {:keys [source selected-items select de-select can-add? placeholder]
+                    :or {source []
                          selected-items []
                          select #(prn "select " %)
                          de-select #(prn "de-select " %)
                          can-add? false}}]
   (let [add (fn [i] (select (goog.object/get i "item")))
         remove (fn [i] (de-select i))
-        opts {:source items
+        opts {:source (if (fn? source)
+                        (fn [a] (clj->js (source a)))
+                        source)
               :freeInput can-add?
               :selectable false
               :placeholder (if can-add?
