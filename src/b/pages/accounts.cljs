@@ -1,7 +1,7 @@
 (ns b.pages.accounts
   (:require [b.domain.core :as d]
             [re-frame.core :as rf]
-            [b.components.tags-input :as tags-input]))
+            [b.components.common :as c]))
 
 
 (defn- new-account-button []
@@ -10,34 +10,13 @@
    "add"])
 
 
-(defn- add-tag
-  "adds a tag to an account, creates the tag if it does not exist"
-  [existing-tags-by-name account-id tag-name]
-  (let [tag (get existing-tags-by-name tag-name)]
-    (if tag
-      (rf/dispatch [::d/add-account-tag account-id (:id tag)])
-      (let [new-tag (d/new-tag tag-name)]
-        (rf/dispatch [::d/add-tag new-tag])
-        (rf/dispatch [::d/add-account-tag account-id (:id new-tag)])))))
-
-
-(defn- de-select-tag [existing-tags-by-name account-id tag-name]
-  (let [tag-id (get-in existing-tags-by-name [tag-name :id])]
-    (rf/dispatch [::d/remove-account-tag account-id tag-id])))
-
-
 (defn- accounts []
-  (let [coll @(rf/subscribe [::d/accounts-list])
-        *existing-tags-by-name (rf/subscribe [::d/tags-by-name])
-        tags @(rf/subscribe [::d/tags])
-        tag-source (fn [] (or (keys @*existing-tags-by-name) []))]
-    [:table.table.is-fullwidth
+  (let [coll @(rf/subscribe [::d/accounts-list])]
+    [:table.table.is-fullwidth.is-narrow
      [:thead
       [:tr
-       [:th "Account "
-        [:small.has-text-light-grey.has-text-weight-normal
-         [new-account-button]]]
-       [:th "Tags"]]]
+       [:td "Account"]
+       [:td "Tags"]]]
      [:tbody
       (->> coll
            (map
@@ -52,14 +31,10 @@
                   #(rf/dispatch
                     [::d/update-account-field id :name (.. % -target -value)])}]]
                [:td
-                [tags-input/component
-                 :can-add? true
-                 :source tag-source
-                 :selected-items (map
-                                  #(get-in tags [% :name])
-                                  (:tags account))
-                 :select #(add-tag @*existing-tags-by-name id %)
-                 :de-select #(de-select-tag @*existing-tags-by-name id %)]]])))
+                [c/tags-input
+                 :selected-tag-ids (:tags account)
+                 :select #(rf/dispatch [::d/add-account-tag id %])
+                 :de-select #(rf/dispatch [::d/remove-account-tag id %])]]])))
       [:tr {:col-span 2}
        [:td [new-account-button]]]]]))
 
@@ -70,12 +45,19 @@
      (->> coll
           (map-indexed
            (fn [i t]
-             [:li {:key i} (:name t)])))]))
+
+             [:li {:key i :style {:display "flex" :flex-diraction "row"}}
+              (:name t)
+              [c/color-picker
+               :selected-color (:color t)
+               :pick #(rf/dispatch [::d/set-tag-color (:id t) %])]])))]))
 
 
 (defn component []
-  [:div
-   [:h1.title "Accounts"]
-   [accounts]
-   [:h1.title "Tags"]
-   [tags]])
+  [:div.columns
+   [:div.column
+    [:h1.heading "Accounts"]
+    [accounts]]
+   [:div.column
+    [:h1.heading "Tags"]
+    [tags]]])

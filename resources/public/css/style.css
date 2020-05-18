@@ -1,0 +1,27 @@
+.pick-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.pick-container > div.pick-button {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin: 3px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.color-picker {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.color-picker > div {
+  width: 20px;
+  height: 20px;
+  margin: 3px;
+  cursor: pointer;
+  border-radius: 15px;
+}
