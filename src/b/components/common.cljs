@@ -85,3 +85,18 @@
            :style {:background-color selected-color}}]
          [:div.color-picker
           {:class  selector-id}]])})))
+
+
+(defn tags-as-text [tag-ids]
+  (let [tag-map @(rf/subscribe [::d/tags])]
+    [:div
+     (->> tag-ids
+          (map #(get tag-map %))
+          (map-indexed
+           (fn [i tag]
+             [:strong
+              {:key i
+               :style {:color (:color tag)}}
+              (:name tag)]))
+          (interpose ", ")
+          (into [:div ]))]))
