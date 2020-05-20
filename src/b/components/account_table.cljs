@@ -2,11 +2,28 @@
   (:require [b.domain.core :as d]
             [re-frame.core :as rf]
             [b.components.common :as c]
-            [clojure.set :as c.set]))
+            [b.components.form :as f]
+            [clojure.set :as c.set]
+            [b.domain.queries :as q]))
 
 ;;#{"36b8c47e-a6a5-4ba2-b265-d2c331c18f5a" "0ecf8ddc-5ed8-43bc-a99e-9719b21b6f40"}
+
+
+(q/reg-query ::accounts-table "Accounts"
+             :form {:fields
+                    [{:type ::f/text
+                      :id   :title
+                      :label "Title"
+                      :description ""}
+                     {:type ::f/tags
+                      :id   :header-tags
+                      :label "Column Tags"
+                      :description "Tags added here will appear as a column on the table"}]})
+
+
 (defn component [query-fields]
-  (let [header-tags #{"dfdbb47b-e6d8-4680-a957-d7bedd08888c" "2cec1ff9-8d95-462e-a409-ecede57c7d90"}
+  (let [{:keys [header-tags title]
+         :or {header-tags #{}}} query-fields
         accounts @(rf/subscribe [::d/accounts-list])
         tags @(rf/subscribe [::d/tags])
         header-tags (->> header-tags

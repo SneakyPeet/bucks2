@@ -3,8 +3,6 @@
             [b.components.common :as c]))
 
 
-
-
 (rf/reg-sub
  ::form-data
  (fn [db [_ path]]

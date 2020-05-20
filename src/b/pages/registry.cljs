@@ -1,5 +1,6 @@
 (ns b.pages.registry
   (:require [b.pages.core :as p]
+            [b.domain.queries :as q]
             [b.pages.help :as help]
             [b.pages.accounts :as accounts]))
 
