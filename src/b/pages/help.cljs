@@ -18,4 +18,12 @@
    #_[at/component {}]
    #_[f/form [:foo :bar] f/example-form :debug? true]
    #_[q/query-selector prn]
-   [rg/component]])
+   [rg/component
+    {:layout-map
+     {"a" {:i "a" :x 0 :y 0 :w 1 :h 2 :static true}
+      "b" {:i "b" :x 1 :y 0 :w 3 :h 2 :minW 2 :maxW 4}
+      "c" {:i "c" :x 4 :y 0 :w 1 :h 2}}
+     :changed prn}
+    [:div.box {:key "a"} "a"]
+    [:div.box {:key "b"} "b"]
+    [:div.box {:key "c"} "c"]]])

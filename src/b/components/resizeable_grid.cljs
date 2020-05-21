@@ -1,24 +1,73 @@
 (ns b.components.resizeable-grid
   (:require [goog.object]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [b.utils :as u]))
+
+(defn- width-provider []
+  (goog.object/get js/ReactGridLayout "WidthProvider"))
+
 
 (defn- react-grid-layout []
-  (r/adapt-react-class js/ReactGridLayout))
+  (r/adapt-react-class ((width-provider) js/ReactGridLayout)))
 
 
 (defn- responsive-react-grid-layout []
-  (r/adapt-react-class (goog.object/get js/ReactGridLayout "Responsive")))
+  (r/adapt-react-class ((width-provider) (goog.object/get js/ReactGridLayout "Responsive"))))
 
 
-(defn component []
+(defn- layout->clj [l]
+  (->> l
+       js->clj
+       (map (fn [i]
+              (->> i
+                   (map (fn [[k v]]
+                          [(keyword k) v]))
+                   (into {}))))
+       (u/index-by :i)))
+
+
+(defn- find-next-row [layout-map]
+  (->> layout-map
+       vals
+       (map :y)
+       (remove nil?)
+       (apply max)
+       inc))
+
+
+(defn new-component-layout-config
+  [layout-map {:keys [id w h]
+               :or {w 4 h 2}}]
+  {:i id
+   :x 0
+   :y (find-next-row layout-map)
+   :w w
+   :h h})
+
+
+(defn component [{:keys [layout-map changed]
+                  :or {layout-map {}
+                       changed prn}}
+                 & children]
   (let [grid (react-grid-layout)]
      [grid {:class "layout"
-            :layout [{:i "a" :x 0 :y 0 :w 1 :h 2 :static true}
-                     {:i "b" :x 1 :y 0 :w 3 :h 2 :minW 2 :maxW 4}
-                     {:i "c" :x 4 :y 0 :w 1 :h 2}]
+            :layout (vals layout-map)
             :cols 12
             :row-height 30
-            :width 1200}
-      [:div.box {:key "a"} "a"]
-      [:div.box {:key "b"} "b"]
-      [:div.box {:key "c"} "c"]]))
+            :onLayoutChange changed}
+      children]))
+
+
+(def ^:private example-item-layout {:y 0,
+                                    :maxH nil,
+                                    :moved false,
+                                    :minW nil,
+                                    :w 1,
+                                    :static true,
+                                    :isDraggable nil,
+                                    :isResizable nil,
+                                    :h 2,
+                                    :minH nil,
+                                    :x 0,
+                                    :maxW nil,
+                                    :i "a"})
