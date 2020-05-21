@@ -53,18 +53,15 @@
                     [::set-form-field data-path (:id field) transform default a])))]
     [:div
      (when debug?
-       [:p.has-text-centered (str data)])
+       [:p (str data)])
      (->> (:fields form-config)
           (map-indexed
            (fn [i f]
-             [:div.field.is-horizontal {:key i}
-              [:div.field-label.is-normal
-               [:label.label (:label f)]]
-              [:div.field-body
-               [:div.field
-                (render-field (answer f) f (get data (:id f)))
-                (when-let [d (:description f)]
-                  [:p.help d])]]])))]))
+             [:div.field {:key i}
+              [:label.label (:label f)]
+              (render-field (answer f) f (get data (:id f)))
+              (when-let [d (:description f)]
+                [:p.help d])])))]))
 
 
 (defmethod render-field ::tags

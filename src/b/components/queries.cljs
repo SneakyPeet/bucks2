@@ -45,13 +45,16 @@
        (assoc ::selector-state ::select-query))))
 
 
+(defn make-query [query-key fields]
+  {:id (d/new-id)
+   :query-key query-key
+   :fields fields})
+
+
 (defn- finished-query []
   (let [query-key (:query-key @(rf/subscribe [::selected-query]))
-        fields @(rf/subscribe [::query-fields])
-        id (d/new-id)]
-    {:id id
-     :query-key query-key
-     :fields fields}))
+        fields @(rf/subscribe [::query-fields])]
+    (make-query query-key fields)))
 
 
 (defn- select-query []
@@ -60,41 +63,38 @@
      (->> query-groups
           (map-indexed
            (fn [i {:keys [group queries]}]
-             [:div {:key i}
+             [:div.content {:key i}
               [:p.heading group]
-              [:div.columns.is-mobile.is-multiline
+              [:div
                (->> queries
                     (map-indexed
                      (fn [j {:keys [title description] :as query}]
                        (let [select #(rf/dispatch [::select-query query])]
-                         [:div.column.is-one-third
+                         [:div.column.is-half
                           {:key (str i j)}
-                          [:div.box {:on-click select :style {:cursor "pointer"}}
-                           [:p.heading [:a {:on-click select}
-                                        title]]
-                           [:p description]]]))))]
-              [:br]])))]))
+                          [:p.title.is-5 [:a {:on-click select}
+                                       title]]
+                          [:p.subtitle.is-7 description]]))))]])))]))
 
 
 (defn query-form [save-query]
   (let [query @(rf/subscribe [::selected-query])]
     [:div
-     [:h1.heading (:title query)]
-     (when-let [d (:description query)] [:p d])
-     [f/form [::query-fields] (:form query) :debug? true]
-     [:div.field.is-horizontal
-      [:div.field-label.is-normal]
-      [:div.field-body
-       [:div.control
-        [:div.buttons
-         [:button.button.is-primary
-          {:on-click #(do
-                        (when save-query (save-query (finished-query)))
-                        (rf/dispatch [::reset]))}
-          "Create"]
-         [:button.button
-          {:on-click #(rf/dispatch [::reset])}
-          "back"]]]]]]))
+     [:div
+      [:h1.title (:title query)]]
+     (when-let [d (:description query)] [:h2.subtitle d])
+     [f/form [::query-fields] (:form query) #_#_:debug? true]
+     [:div.field.is-grouped.is-grouped-right
+      [:p.control
+       [:button.button.is-primary
+        {:on-click #(do
+                      (when save-query (save-query (finished-query)))
+                      (rf/dispatch [::reset]))}
+        "Add"]]
+      [:p.control
+       [:button.button
+        {:on-click #(rf/dispatch [::reset])}
+        "Back"]]]]))
 
 
 (defn query-selector [save-query]

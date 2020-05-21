@@ -26,13 +26,16 @@
        (u/index-by :i)))
 
 
-(defn- find-next-row [layout-map]
-  (->> layout-map
-       vals
-       (map :y)
-       (remove nil?)
-       (apply max)
-       inc))
+(defn- find-next-row
+  [layout-map]
+  (if (empty? layout-map)
+    0
+    (->> layout-map
+         vals
+         (map :y)
+         (remove nil?)
+         (apply max)
+         inc)))
 
 
 (defn new-component-layout-config
@@ -54,7 +57,7 @@
             :layout (vals layout-map)
             :cols 12
             :row-height 30
-            :onLayoutChange changed}
+            :onLayoutChange #(changed (layout->clj %))}
       children]))
 
 
