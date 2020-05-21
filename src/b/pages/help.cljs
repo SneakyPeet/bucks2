@@ -3,6 +3,7 @@
             [b.components.account-table :as at]
             [b.components.form :as f]
             [b.components.queries :as q]
+            [b.components.resizeable-grid :as rg]
             [re-frame.core :as rf]))
 
 #_(rf/reg-event-db
@@ -13,7 +14,8 @@
   [:div
    [:h1 "Help"]
    [:br]
-   [c/color-picker]
+   #_[c/color-picker]
    #_[at/component {}]
    #_[f/form [:foo :bar] f/example-form :debug? true]
-   [q/query-selector prn]])
+   #_[q/query-selector prn]
+   [rg/component]])
