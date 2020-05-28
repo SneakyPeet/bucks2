@@ -5,15 +5,40 @@
             [b.components.queries :as q]
             [b.components.resizeable-grid :as rg]
             [b.components.dashboard :as dash]
+            [b.domain.entries :as d.e]
             [re-frame.core :as rf]))
 
 #_(rf/reg-event-db
  ::test
  (fn []))
 
+(defn entries-overview []
+  [:table.table.is-fullwidth
+   [:tbody
+
+    (->> d.e/entry-config
+         vals
+         (group-by :group)
+         (sort-by (fn [[k _]] (get-in d.e/groups [k :pos])))
+         (map-indexed
+          (fn [i [k entries]]
+            [:<> {:key i}
+             [:tr
+              [:td (cond-> {:col-span 2}
+                     (> i 0) (assoc-in [:style :padding-top] "35px"))
+               [:strong k] [:div [:small (get-in d.e/groups [k :description])]]]]
+             (->> entries
+                  (sort-by :pos)
+                  (map-indexed
+                   (fn [j e]
+                     [:tr {:key (str i j)}
+                      [:td (:name e)]
+                      [:td (:description e)]])))])))]])
+
 (defn component []
   [:div
    [:h1 "Help"]
+   [entries-overview]
    [:br]
    #_[c/color-picker]
    #_[at/component {}]
